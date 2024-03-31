@@ -1,5 +1,29 @@
 <script setup lang="ts">
 import HelloWorld from './components/HelloWorld.vue'
+import { Course } from './models';
+import { ref } from 'vue';
+
+import axios from 'axios';
+
+const courses = ref<Course[]>([]);
+
+const getAllCourses = async () => {
+  try {
+    const response = await axios.get<Course[]>("https://ncuesaweb.ncue.edu.tw/DEAN-api/courses");
+    courses.value = response.data;
+  }
+  catch (err) {
+    console.error("Error");
+  }
+}
+
+const filter = () => {
+  courses.value = courses.value.filter((course) => {
+    return course.id <= 500;
+  });
+}
+
+getAllCourses();
 </script>
 
 <template>
@@ -12,6 +36,27 @@ import HelloWorld from './components/HelloWorld.vue'
     </a>
   </div>
   <HelloWorld msg="Vite + Vue" />
+
+  <table>
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>開課ID</th>
+        <th>課程中文名稱</th>
+        <th>開課教師</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="course in courses" :key="course.id">
+        <td>{{ course.id }}</td>
+        <td>{{ course.course_id }}</td>
+        <td>{{ course.course_zh_name }}</td>
+        <td>{{ course.course_teacher_name }}</td>
+      </tr>
+    </tbody>
+  </table>
+  <button type="button" @click="filter">Filter</button>
+
 </template>
 
 <style scoped>
